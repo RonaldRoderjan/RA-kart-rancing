@@ -1,6 +1,5 @@
-# app/main.py
 from fastapi import FastAPI
-from app.routers import categorias, pilotos # <-- 1. IMPORTAR PILOTOS
+from app.routers import categorias, pilotos, transacoes, dashboard
 
 app = FastAPI(
     title="RA KartRacing API",
@@ -9,7 +8,9 @@ app = FastAPI(
 )
 
 app.include_router(categorias.router)
-app.include_router(pilotos.router) # <-- 2. INCLUIR O ROUTER DE PILOTOS
+app.include_router(pilotos.router)
+app.include_router(transacoes.router)
+app.include_router(dashboard.router)
 
 @app.get("/")
 def read_root():
