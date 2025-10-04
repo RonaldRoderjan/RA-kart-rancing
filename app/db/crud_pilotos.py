@@ -69,38 +69,46 @@ def delete_piloto(piloto_id: int):
         print(f"Ocorreu um erro ao deletar o piloto: {e}")
         return False
 
-def get_piloto_summary(piloto_id):
+def get_piloto_summary(piloto_id: int):
     try:
-        response_piloto = supabase_client.from_("pilotos").select("valor_mensalidade").eq("piloto_id", piloto_id).single().execute()
-        if not response_piloto.data:
-            return None
-        
-        mensalidade = response_piloto.data.get('valor_mensalidade', 0)
+        # 1. Busca os dados base do piloto (mensalidade) - SEM O .single()
+        response_piloto = supabase_client.from_("pilotos").select("valor_mensalidade").eq("piloto_id", piloto_id).execute()
 
+        # Agora, verificamos se a lista de dados está vazia
+        if not response_piloto.data:
+            print(f"Piloto com ID {piloto_id} não encontrado.")
+            return None # Piloto não encontrado
+
+        # Como não usamos .single(), o resultado é uma lista, então pegamos o primeiro item
+        mensalidade = response_piloto.data[0].get('valor_mensalidade', 0)
+
+        # 2. Busca as transações do piloto no mês corrente
         today = date.today()
         start_of_month = today.replace(day=1)
 
         response_transacoes = supabase_client.from_("transacoes").select("valor, tipo").eq("piloto_id", piloto_id).gte("data_transacao", str(start_of_month)).execute()
-     
+
+        # 3. Calcula os totais
         total_gastos = 0.0
-        total_reembolso = 0.0
+        total_reembolsos = 0.0
         if response_transacoes.data:
             for transacao in response_transacoes.data:
                 if transacao['tipo'] == 'GASTO_EXTRA':
-                    total_gasto += transacao['valor']
+                    total_gastos += transacao['valor']
                 elif transacao['tipo'] == 'REEMBOLSO':
                     total_reembolsos += transacao['valor']
-    
-            valor_final = mensalidade + total_gastos - total_reembolsos
 
-            summary = {
+        # 4. Calcula o valor final
+        valor_final = mensalidade + total_gastos - total_reembolsos
+
+        summary = {
             "valor_mensalidade": mensalidade,
             "total_gastos_extras": total_gastos,
             "total_reembolsos": total_reembolsos,
             "valor_final_mes": valor_final
-            }
-            return summary
+        }
+        return summary
 
     except Exception as e:
         print(f"Ocorreu um erro ao calcular o resumo do piloto: {e}")
-        return
+        return None
