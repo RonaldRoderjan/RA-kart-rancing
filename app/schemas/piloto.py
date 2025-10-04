@@ -11,8 +11,6 @@ class PilotoBase(BaseModel):
 class PilotoCreate(PilotoBase):
     categoria_id: int
 
-# NOVO SCHEMA: para receber dados na atualização de um piloto
-# Todos os campos são opcionais
 class PilotoUpdate(BaseModel):
     nome_completo: str | None = None
     apelido: str | None = None
@@ -24,8 +22,9 @@ class Piloto(PilotoBase):
     piloto_id: int
     categoria: Categoria | None = None
 
-class PiloroSummary (BaseModel):
+# A CLASSE QUE ESTAVA FALTANDO NO SEU GITHUB
+class PilotoSummary(BaseModel):
     valor_mensalidade: float
-    total_gastos: float 
+    total_gastos_extras: float
     total_reembolsos: float
     valor_final_mes: float
