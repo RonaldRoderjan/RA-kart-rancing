@@ -1,3 +1,4 @@
+# app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import categorias, pilotos, transacoes, dashboard
@@ -8,11 +9,12 @@ app = FastAPI(
     version="0.1.0"
 )
 
+# Define os endereços que podem acessar a API
 origins = [
     "http://localhost:5173",
-    "http://RA-Kart-Racing.com"
 ]
 
+# Adiciona a configuração de CORS ao FastAPI
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -21,6 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Registra os endpoints
 app.include_router(categorias.router)
 app.include_router(pilotos.router)
 app.include_router(transacoes.router)
