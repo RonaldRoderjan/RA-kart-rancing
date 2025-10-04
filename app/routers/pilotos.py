@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from typing import List
-from app.schemas.piloto import Piloto, PilotoCreate, PilotoUpdate  # Importa nosso novo schema
+from app.schemas.piloto import Piloto, PilotoCreate, PilotoUpdate, PilotoSummary 
 from app.db import crud_pilotos
 from app.schemas.transacao import Transacao
 from app.db import crud_transacoes
@@ -55,3 +55,10 @@ def read_transacoes_for_piloto(piloto_id: int):
     if transacoes is None:
         raise HTTPException(status_code=500, detail="Erro ao buscar transações do piloto.")
     return transacoes
+
+@router.get("/{piloto_id}/summary", response_model=PilotoSummary, tags=["Pilotos"])
+def read_piloto_summary(piloto_id: int):
+    summary_data = crud_pilotos.get_piloto_summary(piloto_id=piloto_id)
+    if summary_data is None:
+        raise HTTPException(status_code=404, detail="Pilioto não encontrado ou erro ao culcular resumo.")
+    return summary_data

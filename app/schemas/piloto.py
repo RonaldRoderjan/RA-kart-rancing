@@ -23,3 +23,9 @@ class PilotoUpdate(BaseModel):
 class Piloto(PilotoBase):
     piloto_id: int
     categoria: Categoria | None = None
+
+class PiloroSummary (BaseModel):
+    valor_mensalidade: float
+    total_gastos: float 
+    total_reembolsos: float
+    valor_final_mes: float

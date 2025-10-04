@@ -1,6 +1,7 @@
 # app/db/crud_pilotos.py
 from app.db.database import supabase_client
 from app.schemas.piloto import PilotoCreate, PilotoUpdate
+from datatime import date
 
 def get_all_pilotos():
     try:
@@ -68,5 +69,38 @@ def delete_piloto(piloto_id: int):
         print(f"Ocorreu um erro ao deletar o piloto: {e}")
         return False
 
-
+def get_piloto_summary(piloto_id):
+    try:
+        response_piloto = supabase_client.from_("pilotos").select("valor_mensalidade").eq("piloto_id", piloto_id).single().execute()
+        if not response_piloto.data:
+            return None
         
+        mensalidade = response_piloto.data.get('valor_mensalidade', 0)
+
+        today = date.today()
+        start_of_month = today.replace(day=1)
+
+        response_transacoes = supabase_client.from_("transacoes").select("valor, tipo").eq("piloto_id", piloto_id).gte("data_transacao", str(start_of_month)).execute()
+     
+        total_gastos = 0.0
+        total_reembolso = 0.0
+        if response_transacoes.data:
+            for transacao in response_transacoes.data:
+                if transacao['tipo'] == 'GASTO_EXTRA':
+                    total_gasto += transacao['valor']
+                elif transacao['tipo'] == 'REEMBOLSO':
+                    total_reembolsos += transacao['valor']
+    
+            valor_final = mensalidade + total_gastos - total_reembolsos
+
+            summary = {
+            "valor_mensalidade": mensalidade,
+            "total_gastos_extras": total_gastos,
+            "total_reembolsos": total_reembolsos,
+            "valor_final_mes": valor_final
+            }
+            return summary
+
+    except Exception as e:
+        print(f"Ocorreu um erro ao calcular o resumo do piloto: {e}")
+        return
