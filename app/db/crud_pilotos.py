@@ -1,7 +1,7 @@
 # app/db/crud_pilotos.py
 from app.db.database import supabase_client
 from app.schemas.piloto import PilotoCreate, PilotoUpdate
-from datatime import date
+from datetime import date
 
 def get_all_pilotos():
     try:
