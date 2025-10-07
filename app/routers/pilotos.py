@@ -1,9 +1,10 @@
 # app/routers/pilotos.py
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from app.db import crud_categorias, crud_pilotos, crud_transacoes # Adicionei os outros cruds aqui para o futuro
 from app.schemas.piloto import Piloto, PilotoCreate, PilotoUpdate, PilotoSummary
 from app.schemas.transacao import Transacao
+from app.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/pilotos",
